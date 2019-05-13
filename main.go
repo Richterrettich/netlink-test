@@ -7,9 +7,15 @@ import (
 )
 
 func main() {
+
+	interfaces, err := netlink.LinkList()
+	if err != nil {
+		panic(err)
+	}
+
 	addrUpdates := make(chan netlink.AddrUpdate, 0)
 	done := make(chan struct{}, 0)
-	err := netlink.AddrSubscribeWithOptions(addrUpdates, done, netlink.AddrSubscribeOptions{
+	err = netlink.AddrSubscribeWithOptions(addrUpdates, done, netlink.AddrSubscribeOptions{
 		ListExisting: true,
 	})
 
@@ -18,6 +24,6 @@ func main() {
 	}
 
 	for update := range addrUpdates {
-		fmt.Println(update.LinkAddress.String())
+		fmt.Println(interfaces[update.LinkIndex].Attrs().Name, update.LinkAddress.String())
 	}
 }
